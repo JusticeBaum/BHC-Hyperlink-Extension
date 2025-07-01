@@ -5,15 +5,35 @@
 
   const patterns = [
   {
-    regex: /\b(PU)\s?:?#?\s?(\d{6,})\b/gi,
+    regex: /\b(pick\s*up|pickup|pick-up|pu\/ex|puex|pu)\s?:?#?-?\s?(\d{6,})\b/gi,
     urlTemplate: (prefix, number) => `https://brightree.net/OrderEntry/frmPuExPopup.aspx?PuExKey=${number}&Edit=1`,
     linkText: (prefix, number) => `${prefix.toUpperCase()} ${number}`
   },
+
   {
-    regex: /\b(SO)\s?#?:?\s?(\d{7,})\b/gi,
+    regex: /\b(SO|sales order)\s?#?:?-?\s?(\d{7,})\b/gi,
     urlTemplate: (prefix, number) => `https://brightree.net/OrderEntry/frmSOOrder.aspx?SalesOrderKey=${number}&Edit=1&ShowAck=1`,
-    linkText: (prefix, number) => `${prefix.toUpperCase()} ${number}`
+    linkText: (prefix, number) => {
+        const normalizedPrefix = prefix.toLowerCase();
+        if (normalizedPrefix === 'sales order') {
+          return `Sales Order ${number}`;
+        } else {
+          return `${prefix.toUpperCase()} ${number}`;
+        }
+      }
   },
+  {
+    regex:/\b(CO|connect order|connect)\s?#?:?-?\s?(\d{6,})\b/gi,
+    urlTemplate: (prefix, number) => `https://bhcconnect.com/app/orders/${number}`,
+    linkText: (prefix, number) => {
+        const normalizedPrefix = prefix.toLowerCase();
+        if (normalizedPrefix != 'CO') {
+          return `${prefix} ${number}`;
+        } else {
+          return `${prefix.toUpperCase()} ${number}`;
+        }
+      }
+  }
 ];
 
   function shouldProcessElement(element) {
