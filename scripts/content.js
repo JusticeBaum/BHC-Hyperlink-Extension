@@ -9,7 +9,6 @@
     urlTemplate: (prefix, number) => `https://brightree.net/OrderEntry/frmPuExPopup.aspx?PuExKey=${number}&Edit=1`,
     linkText: (prefix, number) => `${prefix.toUpperCase()} ${number}`
   },
-
   {
     regex: /\b(SO|sales order)\s?#?:?-?\s?(\d{7,})\b/gi,
     urlTemplate: (prefix, number) => `https://brightree.net/OrderEntry/frmSOOrder.aspx?SalesOrderKey=${number}&Edit=1&ShowAck=1`,
@@ -23,16 +22,25 @@
       }
   },
   {
-    regex:/\b(CO|connect order|connect)\s?#?:?-?\s?(\d{6,})\b/gi,
+    regex: /\b(connect\s+order\s+number|connect\s+order|connect|CO)\s?#?:?-?\s?(\d{6,})\b/gi,
     urlTemplate: (prefix, number) => `https://bhcconnect.com/app/orders/${number}`,
     linkText: (prefix, number) => {
-        const normalizedPrefix = prefix.toLowerCase();
-        if (normalizedPrefix != 'CO') {
-          return `${prefix} ${number}`;
+        const normalizedPrefix = prefix.toLowerCase().replace(/\s+/g, ' ').trim();
+        if (normalizedPrefix === 'connect order number') {
+          return `Connect Order Number ${number}`;
+        } else if (normalizedPrefix === 'connect order') {
+          return `Connect Order ${number}`;
+        } else if (normalizedPrefix === 'connect') {
+          return `Connect ${number}`;
         } else {
           return `${prefix.toUpperCase()} ${number}`;
         }
       }
+  },
+  {
+   regex: /(https:\/\/app\.ashvin\.ai\/app\/organizations\/36e50775-1e08-4d87-a34d-1dce640be91a\/holds\/)(\S+)/g,
+    urlTemplate: (prefix, id) => `${prefix}${id}`,
+    linkText: (prefix, id) => `View Ashvin Referral ${id}`
   }
 ];
 
@@ -41,18 +49,11 @@
     
     const tagName = element.tagName.toLowerCase();
     
-    // Skip noncontent elements
     if (['script', 'style', 'noscript', 'iframe', 'object', 'embed'].includes(tagName)) {
       return false;
     }
     
-    // Skip elements that are already links
     if (element.closest('a')) {
-      return false;
-    }
-    
-    // Skip input fields and textareas to avoid interfering with user input
-    if (['input', 'textarea', 'select'].includes(tagName)) {
       return false;
     }
     
@@ -105,7 +106,6 @@
         fragment.appendChild(document.createTextNode(textBefore));
       }
       
-      // Create the link element
       const link = document.createElement('a');
       const url = pattern.urlTemplate(matchInfo.prefix, matchInfo.number);
       const linkText = pattern.linkText(matchInfo.prefix, matchInfo.number);
