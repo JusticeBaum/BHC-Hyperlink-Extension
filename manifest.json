@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "BT hyperlinks",
   "version": "1.0",
-  "description": "Converts plain text SO/PU numbers into hyperlinks",
+  "description": "Converts plain text SO/PU numbers into hyperlinks and popup windows to new tabs",
   "permissions": [
     "activeTab",
     "scripting"
@@ -13,8 +13,12 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["scripts/content.js"],
-      "run_at": "document_idle",
+      "js": [
+        "scripts/linker.js",
+        "scripts/tpm.js",
+        "scripts/windowRedirect.js"
+      ],
+      "run_at": "document_start",
       "all_frames": true
     }
   ]
